@@ -1,13 +1,6 @@
-const { createClient } = require('@supabase/supabase-js');
-
-// INEGI Config
-const INEGI_TOKEN = '57806cbc-6e61-c150-76a8-faf4b2b183a3';
-const INDICATOR_NATIONAL = '6207061408'; // PIB Nacional (Precios 2018)
-const INDICATOR_STATES = '6207061433';   // PIB Estatal (Precios 2018)
-
-// Supabase Config
-const SUPABASE_URL = 'https://ndpfcmvqgvrllisfkzsy.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kcGZjbXZxZ3ZybGxpc2ZrenN5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDI1MTY5MSwiZXhwIjoyMDg1ODI3NjkxfQ.9-6NXNJyrtPTBzMzFZDkf9gDmHYikW6jc5LoPsOrypE';
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+const INEGI_TOKEN = process.env.INEGI_TOKEN;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 

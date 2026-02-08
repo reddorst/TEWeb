@@ -1,4 +1,5 @@
-const BANXICO_TOKEN = '02911a306e93b839b27baff85baceeca2618924821a81326fa42db458f18e04c';
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+const BANXICO_TOKEN = process.env.BANXICO_TOKEN;
 const candidates = ['SP74665', 'SP4962']; // SP74665 is often used for annual variation
 
 async function test() {

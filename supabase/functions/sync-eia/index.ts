@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const EIA_API_KEY = 'TQkJebOcn6tfT2YAdQKjeOL2ggHDi8vUlpGV7c73';
+const EIA_API_KEY = Deno.env.get('EIA_API_KEY');
 
 Deno.serve(async (req) => {
     console.log('--- Inicia Sincronización Automática (Edge Function) ---');

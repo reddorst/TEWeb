@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const BANXICO_TOKEN = '02911a306e93b839b27baff85baceeca2618924821a81326fa42db458f18e04c';
+const BANXICO_TOKEN = Deno.env.get('BANXICO_TOKEN');
 
 Deno.serve(async (req) => {
     console.log('--- Inicia Sincronización Banxico (Edge Function) ---');

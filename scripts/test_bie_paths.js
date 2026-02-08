@@ -1,4 +1,5 @@
-const INEGI_TOKEN = '57806cbc-6e61-c150-76a8-faf4b2b183a3';
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+const INEGI_TOKEN = process.env.INEGI_TOKEN;
 
 const tests = [
     { name: 'PIB 2018 (indicadores path)', path: 'indicadores', id: '6207061408', area: '00', source: 'BIE' },

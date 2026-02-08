@@ -1,6 +1,7 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 import https from 'https';
 
-const BANXICO_TOKEN = '02911a306e93b839b27baff85baceeca2618924821a81326fa42db458f18e04c';
+const BANXICO_TOKEN = process.env.BANXICO_TOKEN;
 const seriesId = 'SP30562';
 const url = `https://www.banxico.org.mx/SieAPIRest/service/v1/series/${seriesId}/datos?token=${BANXICO_TOKEN}`;
 
