@@ -5,6 +5,8 @@
 - **Supabase**: Migrado a sistema de Publishable/Secret Keys
 - **OpenWeather**: Token regenerado (`42554105...`)
 - **Banxico**: Token regenerado (`d62bebc3...`)
+- **INEGI**: Token regenerado (`f657e3ee...`)
+- **EIA**: Token regenerado (`pfuHRecjp...`)
 - **Código**: Todos los secretos movidos a variables de entorno
 - **GitHub**: Código seguro subido (sin secretos expuestos)
 
@@ -90,17 +92,6 @@ Entornos: ✅ Production  ✅ Preview  ✅ Development
 5. Verifica que en las peticiones:
    - ✅ Se usen las APIs de Supabase/OpenWeather
    - ❌ NO se vean los tokens completos en la consola
-
----
-
-## ⚠️ Tokens Aún Pendientes de Regenerar
-
-Cuando tengas tiempo, deberías regenerar:
-
-- **INEGI**: `57806cbc-6e61-c150-76a8-faf4b2b183a3` (expuesto previamente)
-- **EIA**: `TQkJebOc...` (expuesto previamente)
-
-Estos tokens solo afectan scripts locales, no la app en producción.
 
 ---
 
