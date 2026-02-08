@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, CircleMarker, Tooltip as LeafletTooltip } from 'react-leaflet';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid,
-    Tooltip as RechartsTooltip, ResponsiveContainer,
-    LineChart, Line
+    Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
 import shp from 'shpjs';
 import 'leaflet/dist/leaflet.css';
