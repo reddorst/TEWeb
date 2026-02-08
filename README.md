@@ -49,10 +49,57 @@ Este proyecto es un tablero interactivo para la visualización y análisis de da
    npm run dev
    ```
 
-## Despliegue
+## Despliegue en Vercel
 
-Este proyecto está optimizado para desplegarse en **Vercel** o **Netlify**.
-Simplemente importa este repositorio y el comando de construcción (`npm run build`) se detectará automáticamente.
+Este proyecto está optimizado para desplegarse en **Vercel** (recomendado).
+
+### Pasos para Desplegar
+
+1. **Sube tu código a GitHub** (si aún no lo has hecho):
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+   git push -u origin main
+   ```
+
+2. **Despliega en Vercel**:
+   - Ve a [vercel.com](https://vercel.com) e inicia sesión con tu cuenta de GitHub
+   - Haz clic en **"Add New..."** → **"Project"**
+   - Importa tu repositorio de GitHub
+   - Vercel detectará automáticamente:
+     - **Framework**: Vite
+     - **Build Command**: `npm run build`
+     - **Output Directory**: `dist`
+   - Haz clic en **"Deploy"**
+
+3. **Resultado**:
+   - Tu aplicación estará disponible 24/7 sin dormirse
+   - Se actualizará automáticamente con cada `git push` a la rama `main`
+   - Obtendrás una URL única: `tu-proyecto.vercel.app`
+
+### Características del Hosting en Vercel (Plan Gratuito)
+
+✅ **Disponibilidad 24/7** - Sin tiempos de inactividad  
+✅ **CDN Global** - Carga rápida desde cualquier ubicación  
+✅ **SSL/HTTPS** - Certificado automático  
+✅ **100GB** de ancho de banda/mes  
+✅ **Deployments automáticos** desde GitHub  
+
+## Solución de Problemas
+
+### Error: `TS6133: 'X' is declared but its value is never read`
+**Causa**: Importaciones no utilizadas en archivos TypeScript.  
+**Solución**: Elimina las importaciones no utilizadas del archivo indicado.
+
+### Error: `failed to push some refs`
+**Causa**: El repositorio local no está sincronizado con el remoto.  
+**Solución**: Ejecuta `git pull --rebase origin main` antes de hacer push.
+
+### Error: `fatal: not a git repository`
+**Causa**: No has inicializado git en tu carpeta.  
+**Solución**: Ejecuta `git init` en la raíz del proyecto.
 
 ---
 Desarrollado con ❤️ para el análisis del sector energético.
