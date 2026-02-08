@@ -34,7 +34,7 @@ const categories = [
     { id: 'temperatura', name: 'Temperatura' }
 ];
 
-const WEATHER_API_KEY = '889f5116e756f90da9071db4701e56ff';
+const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
 export const DataPage = () => {
     const { getForecastUseCase } = useUseCases();

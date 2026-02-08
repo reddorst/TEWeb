@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { MEXICO_CITIES, type City } from '../data/cities_data';
 import { Thermometer, AlertCircle, RefreshCw } from 'lucide-react';
 
-const WEATHER_API_KEY = '889f5116e756f90da9071db4701e56ff';
+const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const CACHE_KEY = 'mexico_weather_heat_cache';
 const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
 
