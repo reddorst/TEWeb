@@ -34,6 +34,8 @@ const categories = [
     { id: 'temperatura', name: 'Temperatura' }
 ];
 
+// 🔒 SECURITY: API keys are loaded via environment variables to prevent accidental exposure.
+// These variables must be prefixed with VITE_ to be accessible in the client.
 const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
 export const DataPage = () => {

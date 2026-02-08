@@ -1,3 +1,8 @@
+/**
+ * 🔒 SECURITY: Supabase client configuration using environment variables.
+ * Values are loaded from .env.local (development) or Vercel (production).
+ * NEVER hardcode API keys or secrets in this file.
+ */
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
