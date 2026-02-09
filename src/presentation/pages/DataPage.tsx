@@ -969,436 +969,542 @@ export const DataPage = () => {
                     </section>
                 )}
             </div>
+        )
+    }
+            </div >
         );
     }
 
+// Layout for Parity (specialized - multiple charts)
+if (selectedCategoryId === 'paridad') {
+    const usdSeriesRaw = seriesList.find(s => s.id === 'paridad-mxn-usd');
+    const eurSeriesRaw = seriesList.find(s => s.id === 'paridad-mxn-eur');
+    const calculateFxFiltered = (series: any) => {
+        if (!series) return null;
+        return {
+            ...series,
+            data: series.data.filter((d: any) => (!startDate || d.date >= startDate) && (!endDate || d.date <= endDate))
+        };
+    };
+
+    const usdFiltered = calculateFxFiltered(usdSeriesRaw);
+    const eurFiltered = calculateFxFiltered(eurSeriesRaw);
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
-            {/* Submenu and Controls */}
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.5rem',
-                paddingBottom: '1.5rem',
-                borderBottom: '1px solid #e2e8f0'
-            }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto' }}>
                     {categories.map(cat => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setSelectedCategoryId(cat.id)}
-                            className="cta-button"
-                            style={{
-                                padding: '0.625rem 1.25rem',
-                                borderRadius: '9999px',
-                                border: `2px solid ${selectedCategoryId === cat.id ? COLORS.primary : '#e2e8f0'}`,
-                                backgroundColor: selectedCategoryId === cat.id ? COLORS.primaryLight : 'white',
-                                color: COLORS.text,
-                                fontWeight: 600,
-                                fontSize: '0.875rem',
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap',
-                                transition: 'all 0.2s ease',
-                            }}
-                        >
+                        <button key={cat.id} onClick={() => setSelectedCategoryId(cat.id)} className="cta-button" style={{
+                            padding: '0.625rem 1.25rem', borderRadius: '9999px',
+                            border: `2px solid ${selectedCategoryId === cat.id ? COLORS.primary : '#e2e8f0'}`,
+                            backgroundColor: selectedCategoryId === cat.id ? COLORS.primaryLight : 'white',
+                            color: COLORS.text, fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease',
+                        }}>
                             {cat.name}
                         </button>
                     ))}
                 </div>
-
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '1rem'
-                }}>
-                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                        <button
-                            onClick={fetchData}
-                            disabled={isLoading}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                padding: '0.5rem 1rem',
-                                borderRadius: '8px',
-                                border: '1px solid #e2e8f0',
-                                backgroundColor: 'white',
-                                color: COLORS.text,
-                                fontWeight: 700,
-                                fontSize: '0.75rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                opacity: isLoading ? 0.5 : 1
-                            }}
-                        >
-                            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
-                            Refrescar datos
-                        </button>
-                    </div>
-
-                    {selectedCategoryId === 'paridad' ? (
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            {parityOptions.map(opt => (
-                                <button
-                                    key={opt.id}
-                                    onClick={() => setSubParityId(opt.id)}
-                                    style={{
-                                        padding: '0.4rem 1rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
-                                        backgroundColor: subParityId === opt.id ? '#1e293b' : 'white',
-                                        color: subParityId === opt.id ? 'white' : '#64748b',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 700,
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    {opt.name}
-                                </button>
-                            ))}
-                        </div>
-                    ) : selectedCategoryId === 'inflacion' ? (
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            {inflationOptions.map(opt => (
-                                <button
-                                    key={opt.id}
-                                    onClick={() => setSubInflationId(opt.id)}
-                                    style={{
-                                        padding: '0.4rem 1rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
-                                        backgroundColor: subInflationId === opt.id ? '#1e293b' : 'white',
-                                        color: subInflationId === opt.id ? 'white' : '#64748b',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 700,
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    {opt.name}
-                                </button>
-                            ))}
-                        </div>
-                    ) : selectedCategoryId === 'gas-natural' ? (
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            {gasOptions.map(opt => (
-                                <button
-                                    key={opt.id}
-                                    onClick={() => setSubGasId(opt.id)}
-                                    style={{
-                                        padding: '0.4rem 1rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
-                                        backgroundColor: subGasId === opt.id ? '#1e293b' : 'white',
-                                        color: subGasId === opt.id ? 'white' : '#64748b',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 700,
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    {opt.name}
-                                </button>
-                            ))}
-                        </div>
-                    ) : <div />}
-
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        backgroundColor: '#f8fafc',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '12px',
-                        border: '1px solid #e2e8f0'
-                    }}>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Desde</span>
-                            <input
-                                type="date"
-                                value={startDate}
-                                min={minDate}
-                                max={maxDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                style={{ border: 'none', background: 'transparent', fontSize: '0.875rem', fontWeight: 600, color: COLORS.text, outline: 'none' }}
-                            />
-                        </div>
-                        <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0' }} />
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Hasta</span>
-                            <input
-                                type="date"
-                                value={endDate}
-                                min={minDate}
-                                max={maxDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                style={{ border: 'none', background: 'transparent', fontSize: '0.875rem', fontWeight: 600, color: COLORS.text, outline: 'none' }}
-                            />
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            {
-                activePriceSeries ? (
-                    subGasId === 'gas-natural-ipgn' ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                            {/* Header & Map */}
-                            <div className="card">
-                                <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>
-                                        IPGN (Precios México) - Nacional
-                                    </h3>
-                                    <LatestValueBadge
-                                        data={activePriceSeries.data}
-                                        unit={activePriceSeries.unit}
-                                        mode="monthly"
-                                    />
-                                </div>
-                                <MexicoRegionsMap regions={MEXICO_REGIONS} latestPrices={latestRegionalPrices} />
-                            </div>
-
-                            {/* Comparison Chart */}
-                            <div className="card" style={{ height: '400px' }}>
-                                <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Comparativo: Nacional vs Regiones</h4>
-                                <ResponsiveContainer width="100%" height="90%">
-                                    <LineChart data={mergedRegionalData}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
-                                        <XAxis
-                                            dataKey="date"
-                                            tickFormatter={(val) => new Date(val).toLocaleDateString('es-MX', { month: 'short', year: '2-digit' })}
-                                            tick={{ fontSize: 12 }}
-                                        />
-                                        <YAxis unit=" $" width={40} tick={{ fontSize: 12 }} />
-                                        <Tooltip
-                                            labelFormatter={(label) => new Date(label as string).toLocaleDateString('es-MX', { year: 'numeric', month: 'long' })}
-                                            formatter={(value: number, name: string) => {
-                                                const regionName = MEXICO_REGIONS.find(r => r.id === name)?.name || (name === 'national' ? 'Nacional' : name);
-                                                return [`$${value.toFixed(2)}`, regionName];
-                                            }}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                                        />
-                                        <Line type="monotone" dataKey="national" name="Nacional" stroke={COLORS.text} strokeWidth={3} dot={false} />
-                                        {MEXICO_REGIONS.map(region => (
-                                            <Line
-                                                key={region.id}
-                                                type="monotone"
-                                                dataKey={region.id}
-                                                name={region.id}
-                                                stroke={region.color}
-                                                strokeWidth={1.5}
-                                                dot={false}
-                                            />
-                                        ))}
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            {/* Table */}
-                            <div className="card">
-                                <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Clasificación Regional</h4>
-                                <div style={{ overflowX: 'auto' }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-                                        <thead>
-                                            <tr style={{ borderBottom: `2px solid ${COLORS.grid}`, textAlign: 'left' }}>
-                                                <th style={{ padding: '0.75rem', color: COLORS.text }}>Región</th>
-                                                <th style={{ padding: '0.75rem', color: COLORS.text }}>Estados</th>
-                                                <th style={{ padding: '0.75rem', color: COLORS.text, textAlign: 'right' }}>Último Precio</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {MEXICO_REGIONS.map(r => (
-                                                <tr key={r.id} style={{ borderBottom: `1px solid ${COLORS.grid}` }}>
-                                                    <td style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                        <span style={{ width: '12px', height: '12px', background: r.color, borderRadius: '2px' }}></span>
-                                                        {r.name}
-                                                    </td>
-                                                    <td style={{ padding: '0.75rem', color: COLORS.text }}>{r.states.join(', ')}</td>
-                                                    <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 600, color: '#0d9488' }}>
-                                                        {latestRegionalPrices[r.id] ? `$${latestRegionalPrices[r.id].toFixed(2)}` : '-'}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        // STANDARD VIEW (Daily, Monthly, Annual)
-                        <>
-                            <section id="chart-daily" className="card" style={{ height: '450px', position: 'relative' }}>
-                                <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                            <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
-                                                {subGasId === 'gas-natural-ipgn' ? 'Serie Mensual' : 'Serie Diaria'} - {activePriceSeries.name}
-                                            </h3>
-                                            <LatestValueBadge
-                                                data={activePriceSeries.data}
-                                                unit={activePriceSeries.unit}
-                                                mode="daily"
-                                            />
-                                        </div>
-                                        {selectedCategoryId === 'gas-natural' && (
-                                            <p style={{ fontSize: '0.75rem', color: subGasId === 'gas-natural-price' ? COLORS.up : '#3b82f6', fontWeight: 600, marginTop: '2px' }}>
-                                                Índice: {subGasId === 'gas-natural-price' ? 'Henry Hub (Datos Reales EIA)' : 'IPGN (Precios CRE México)'}
-                                            </p>
-                                        )}
-                                        {selectedCategoryId === 'paridad' && (
-                                            <p style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, marginTop: '2px' }}>
-                                                Fuente: Banxico (Tipo de cambio {activePriceSeries.id === 'paridad-usd-eur' ? 'Calculado' : 'Real'})
-                                            </p>
-                                        )}
-                                        <StatsBadges min={dailyStats.min} max={dailyStats.max} unit={activePriceSeries.unit} />
-                                    </div>
-                                    {exportButtons('chart-daily', `Serie_Diaria_${activePriceSeries.name.replace(/\s+/g, '_')}`, activePriceSeries.data, activePriceSeries.unit)}
-                                </div>
-                                <div className="flex-between" style={{ marginBottom: '1rem', paddingRight: '1rem' }}>
-                                    <div />
-                                    <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Unidad: {activePriceSeries.unit}</span>
-                                </div>
-                                <ResponsiveContainer width="100%" height="80%">
-                                    <AreaChart data={activePriceSeries.data}>
-                                        <defs>
-                                            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
-                                        <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={50} />
-                                        <YAxis
-                                            tick={{ fontSize: 11 }}
-                                            label={{ value: activePriceSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }}
-                                        />
-                                        <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                                        <Area type="monotone" dataKey="value" stroke={COLORS.primary} fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
-                                        <Brush dataKey="date" height={30} stroke={COLORS.primary} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </section >
-
-                            <section id="chart-monthly" className="card" style={{ height: '350px' }}>
-                                <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
-                                    <div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                            <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Promedio Mensual</h3>
-                                            <LatestValueBadge data={monthlyData} unit={activePriceSeries.unit} mode="monthly" />
-                                        </div>
-                                        <StatsBadges min={monthlyStats.min} max={monthlyStats.max} unit={activePriceSeries.unit} />
-                                    </div>
-                                    {exportButtons('chart-monthly', `Promedio_Mensual_${activePriceSeries.name.replace(/\s+/g, '_')}`, monthlyData, activePriceSeries.unit)}
-                                </div>
-                                <ResponsiveContainer width="100%" height="80%">
-                                    <LineChart data={monthlyData}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
-                                        <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                                        <YAxis tick={{ fontSize: 11 }} label={{ value: activePriceSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }} />
-                                        <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                                        <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </section>
-
-                            <section id="chart-annual" className="card" style={{ height: '400px' }}>
-                                <div className="flex-between" style={{ marginBottom: '2.5rem', alignItems: 'flex-start' }}>
-                                    <div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                            <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Promedio Anual (Comparativo YoY)</h3>
-                                            <LatestValueBadge data={annualData} unit={activePriceSeries.unit} mode="annual" />
-                                        </div>
-                                        <StatsBadges min={annualStats.min} max={annualStats.max} unit={activePriceSeries.unit} />
-                                    </div>
-                                    {exportButtons('chart-annual', `Promedio_Anual_${activePriceSeries.name.replace(/\s+/g, '_')}`, annualData, activePriceSeries.unit)}
-                                </div>
-                                <ResponsiveContainer width="100%" height="75%">
-                                    <BarChart data={annualData} margin={{ top: 60, right: 30, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
-                                        <XAxis dataKey="date" />
-                                        <YAxis label={{ value: activePriceSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }} />
-                                        <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                                        <Bar dataKey="value" fill={COLORS.primary} radius={[4, 4, 0, 0]} barSize={70} label={<CustomBarLabel />} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </section>
-                        </>
-                    )
-                ) : (
-                    <div className="card text-center p-8 text-slate-400">Próximamente: Datos de {selectedCategoryId} desde Supabase.</div>
-                )
-            }
-
-            {
-                selectedCategoryId === 'gas-natural' && subGasId === 'gas-natural-price' && reservesSeries && (
-                    <section id="chart-reserves" className="card" style={{ height: '400px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '1.5rem' }}>
+                {usdFiltered ? (
+                    <section id="chart-usd" className="card" style={{ height: '400px' }}>
                         <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
                             <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Reservas Probadas de Gas Natural (Seco)</h3>
-                                    <LatestValueBadge data={reservesSeries.data} unit={reservesSeries.unit} mode="annual" />
-                                </div>
-                                <p style={{ fontSize: '0.75rem', color: COLORS.up, fontWeight: 600 }}>Fuente: EIA (Total USA)</p>
-                                <StatsBadges min={reservesStats.min} max={reservesStats.max} unit={reservesSeries.unit} />
-                                <span style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '4px', display: 'block' }}>Unidad: {reservesSeries.unit}</span>
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>MXN / USD (Fix)</h3>
+                                <LatestValueBadge data={usdFiltered.data} unit="MXN/USD" mode="daily" />
                             </div>
-                            {exportButtons('chart-reserves', 'Reservas_Gas_Natural', reservesSeries.data, reservesSeries.unit)}
-                        </div>
-                        <ResponsiveContainer width="100%" height="75%">
-                            <BarChart data={reservesSeries.data}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
-                                <XAxis dataKey="date" tickFormatter={(val) => val.substring(0, 4)} />
-                                <YAxis label={{ value: reservesSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }} />
-                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={60} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </section>
-                )
-            }
-
-            {
-                selectedCategoryId === 'gas-natural' && subGasId === 'gas-natural-price' && storageSeries && storageSeries.data.length > 0 && (
-                    <section id="chart-storage" className="card" style={{ height: '450px', position: 'relative' }}>
-                        <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Weekly Natural Gas Storage Report</h3>
-                                    <LatestValueBadge data={storageSeries.data} unit={storageSeries.unit} mode="daily" />
-                                </div>
-                                <p style={{ fontSize: '0.75rem', color: COLORS.up, fontWeight: 600, marginTop: '2px' }}>
-                                    Fuente: EIA (Working Gas in Underground Storage - Lower 48)
-                                </p>
-                                <StatsBadges min={storageStats.min} max={storageStats.max} unit={storageSeries.unit} />
-                            </div>
-                            {exportButtons('chart-storage', 'Natural_Gas_Storage_Report', storageSeries.data, storageSeries.unit)}
-                        </div>
-                        <div className="flex-between" style={{ marginBottom: '1rem', paddingRight: '1rem' }}>
-                            <div />
-                            <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Unidad: {storageSeries.unit}</span>
+                            {exportButtons('chart-usd', 'FX_MXN_USD', usdFiltered.data, 'MXN/USD')}
                         </div>
                         <ResponsiveContainer width="100%" height="80%">
-                            <AreaChart data={storageSeries.data}>
+                            <AreaChart data={usdFiltered.data}>
                                 <defs>
-                                    <linearGradient id="colorStorage" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                    <linearGradient id="colorUsd" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
-                                <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={50} />
-                                <YAxis
-                                    tick={{ fontSize: 11 }}
-                                    label={{ value: storageSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }}
-                                />
-                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                                <Area type="monotone" dataKey="value" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorStorage)" strokeWidth={2} />
-                                <Brush dataKey="date" height={30} stroke="#8b5cf6" />
+                                <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                                <YAxis tick={{ fontSize: 11 }} domain={['auto', 'auto']} />
+                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                                <Area type="monotone" dataKey="value" stroke="#10b981" fill="url(#colorUsd)" strokeWidth={2} />
+                                <Brush dataKey="date" height={30} stroke="#10b981" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </section>
-                )
-            }
-        </div >
+                ) : (
+                    <div className="card text-center" style={{ padding: '4rem', color: '#64748b' }}>
+                        <Search size={48} style={{ margin: '0 auto 1rem', opacity: 0.2 }} />
+                        <p>No hay datos de MXN/USD en el periodo seleccionado.</p>
+                    </div>
+                )}
+
+                {eurFiltered ? (
+                    <section id="chart-eur" className="card" style={{ height: '400px' }}>
+                        <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>MXN / EUR</h3>
+                                <LatestValueBadge data={eurFiltered.data} unit="MXN/EUR" mode="daily" />
+                            </div>
+                            {exportButtons('chart-eur', 'FX_MXN_EUR', eurFiltered.data, 'MXN/EUR')}
+                        </div>
+                        <ResponsiveContainer width="100%" height="80%">
+                            <AreaChart data={eurFiltered.data}>
+                                <defs>
+                                    <linearGradient id="colorEur" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                                <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                                <YAxis tick={{ fontSize: 11 }} domain={['auto', 'auto']} />
+                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                                <Area type="monotone" dataKey="value" stroke="#3b82f6" fill="url(#colorEur)" strokeWidth={2} />
+                                <Brush dataKey="date" height={30} stroke="#3b82f6" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </section>
+                ) : (
+                    <div className="card text-center" style={{ padding: '4rem', color: '#64748b' }}>
+                        <Search size={48} style={{ margin: '0 auto 1rem', opacity: 0.2 }} />
+                        <p>No hay datos de MXN/EUR en el periodo seleccionado.</p>
+                    </div>
+                )}
+            </div>
+        </div>
     );
+}
+
+return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
+        {/* Submenu and Controls */}
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+            paddingBottom: '1.5rem',
+            borderBottom: '1px solid #e2e8f0'
+        }}>
+            <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto' }}>
+                {categories.map(cat => (
+                    <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategoryId(cat.id)}
+                        className="cta-button"
+                        style={{
+                            padding: '0.625rem 1.25rem',
+                            borderRadius: '9999px',
+                            border: `2px solid ${selectedCategoryId === cat.id ? COLORS.primary : '#e2e8f0'}`,
+                            backgroundColor: selectedCategoryId === cat.id ? COLORS.primaryLight : 'white',
+                            color: COLORS.text,
+                            fontWeight: 600,
+                            fontSize: '0.875rem',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.2s ease',
+                        }}
+                    >
+                        {cat.name}
+                    </button>
+                ))}
+            </div>
+
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem'
+            }}>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <button
+                        onClick={fetchData}
+                        disabled={isLoading}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            backgroundColor: 'white',
+                            color: COLORS.text,
+                            fontWeight: 700,
+                            fontSize: '0.75rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            opacity: isLoading ? 0.5 : 1
+                        }}
+                    >
+                        <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+                        Refrescar datos
+                    </button>
+                </div>
+
+                {selectedCategoryId === 'paridad' ? (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {parityOptions.map(opt => (
+                            <button
+                                key={opt.id}
+                                onClick={() => setSubParityId(opt.id)}
+                                style={{
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid #cbd5e1',
+                                    backgroundColor: subParityId === opt.id ? '#1e293b' : 'white',
+                                    color: subParityId === opt.id ? 'white' : '#64748b',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                {opt.name}
+                            </button>
+                        ))}
+                    </div>
+                ) : selectedCategoryId === 'inflacion' ? (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {inflationOptions.map(opt => (
+                            <button
+                                key={opt.id}
+                                onClick={() => setSubInflationId(opt.id)}
+                                style={{
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid #cbd5e1',
+                                    backgroundColor: subInflationId === opt.id ? '#1e293b' : 'white',
+                                    color: subInflationId === opt.id ? 'white' : '#64748b',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                {opt.name}
+                            </button>
+                        ))}
+                    </div>
+                ) : selectedCategoryId === 'gas-natural' ? (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {gasOptions.map(opt => (
+                            <button
+                                key={opt.id}
+                                onClick={() => setSubGasId(opt.id)}
+                                style={{
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid #cbd5e1',
+                                    backgroundColor: subGasId === opt.id ? '#1e293b' : 'white',
+                                    color: subGasId === opt.id ? 'white' : '#64748b',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                {opt.name}
+                            </button>
+                        ))}
+                    </div>
+                ) : <div />}
+
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    backgroundColor: '#f8fafc',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0'
+                }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Desde</span>
+                        <input
+                            type="date"
+                            value={startDate}
+                            min={minDate}
+                            max={maxDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            style={{ border: 'none', background: 'transparent', fontSize: '0.875rem', fontWeight: 600, color: COLORS.text, outline: 'none' }}
+                        />
+                    </div>
+                    <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Hasta</span>
+                        <input
+                            type="date"
+                            value={endDate}
+                            min={minDate}
+                            max={maxDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            style={{ border: 'none', background: 'transparent', fontSize: '0.875rem', fontWeight: 600, color: COLORS.text, outline: 'none' }}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {
+            activePriceSeries ? (
+                subGasId === 'gas-natural-ipgn' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        {/* Header & Map */}
+                        <div className="card">
+                            <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+                                    IPGN (Precios México) - Nacional
+                                </h3>
+                                <LatestValueBadge
+                                    data={activePriceSeries.data}
+                                    unit={activePriceSeries.unit}
+                                    mode="monthly"
+                                />
+                            </div>
+                            <MexicoRegionsMap regions={MEXICO_REGIONS} latestPrices={latestRegionalPrices} />
+                        </div>
+
+                        {/* Comparison Chart */}
+                        <div className="card" style={{ height: '400px' }}>
+                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Comparativo: Nacional vs Regiones</h4>
+                            <ResponsiveContainer width="100%" height="90%">
+                                <LineChart data={mergedRegionalData}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                                    <XAxis
+                                        dataKey="date"
+                                        tickFormatter={(val) => new Date(val).toLocaleDateString('es-MX', { month: 'short', year: '2-digit' })}
+                                        tick={{ fontSize: 12 }}
+                                    />
+                                    <YAxis unit=" $" width={40} tick={{ fontSize: 12 }} />
+                                    <Tooltip
+                                        labelFormatter={(label) => new Date(label as string).toLocaleDateString('es-MX', { year: 'numeric', month: 'long' })}
+                                        formatter={(value: number, name: string) => {
+                                            const regionName = MEXICO_REGIONS.find(r => r.id === name)?.name || (name === 'national' ? 'Nacional' : name);
+                                            return [`$${value.toFixed(2)}`, regionName];
+                                        }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                                    />
+                                    <Line type="monotone" dataKey="national" name="Nacional" stroke={COLORS.text} strokeWidth={3} dot={false} />
+                                    {MEXICO_REGIONS.map(region => (
+                                        <Line
+                                            key={region.id}
+                                            type="monotone"
+                                            dataKey={region.id}
+                                            name={region.id}
+                                            stroke={region.color}
+                                            strokeWidth={1.5}
+                                            dot={false}
+                                        />
+                                    ))}
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Table */}
+                        <div className="card">
+                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Clasificación Regional</h4>
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                                    <thead>
+                                        <tr style={{ borderBottom: `2px solid ${COLORS.grid}`, textAlign: 'left' }}>
+                                            <th style={{ padding: '0.75rem', color: COLORS.text }}>Región</th>
+                                            <th style={{ padding: '0.75rem', color: COLORS.text }}>Estados</th>
+                                            <th style={{ padding: '0.75rem', color: COLORS.text, textAlign: 'right' }}>Último Precio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {MEXICO_REGIONS.map(r => (
+                                            <tr key={r.id} style={{ borderBottom: `1px solid ${COLORS.grid}` }}>
+                                                <td style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <span style={{ width: '12px', height: '12px', background: r.color, borderRadius: '2px' }}></span>
+                                                    {r.name}
+                                                </td>
+                                                <td style={{ padding: '0.75rem', color: COLORS.text }}>{r.states.join(', ')}</td>
+                                                <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 600, color: '#0d9488' }}>
+                                                    {latestRegionalPrices[r.id] ? `$${latestRegionalPrices[r.id].toFixed(2)}` : '-'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    // STANDARD VIEW (Daily, Monthly, Annual)
+                    <>
+                        <section id="chart-daily" className="card" style={{ height: '450px', position: 'relative' }}>
+                            <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+                                            {subGasId === 'gas-natural-ipgn' ? 'Serie Mensual' : 'Serie Diaria'} - {activePriceSeries.name}
+                                        </h3>
+                                        <LatestValueBadge
+                                            data={activePriceSeries.data}
+                                            unit={activePriceSeries.unit}
+                                            mode="daily"
+                                        />
+                                    </div>
+                                    {selectedCategoryId === 'gas-natural' && (
+                                        <p style={{ fontSize: '0.75rem', color: subGasId === 'gas-natural-price' ? COLORS.up : '#3b82f6', fontWeight: 600, marginTop: '2px' }}>
+                                            Índice: {subGasId === 'gas-natural-price' ? 'Henry Hub (Datos Reales EIA)' : 'IPGN (Precios CRE México)'}
+                                        </p>
+                                    )}
+                                    {selectedCategoryId === 'paridad' && (
+                                        <p style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, marginTop: '2px' }}>
+                                            Fuente: Banxico (Tipo de cambio {activePriceSeries.id === 'paridad-usd-eur' ? 'Calculado' : 'Real'})
+                                        </p>
+                                    )}
+                                    <StatsBadges min={dailyStats.min} max={dailyStats.max} unit={activePriceSeries.unit} />
+                                </div>
+                                {exportButtons('chart-daily', `Serie_Diaria_${activePriceSeries.name.replace(/\s+/g, '_')}`, activePriceSeries.data, activePriceSeries.unit)}
+                            </div>
+                            <div className="flex-between" style={{ marginBottom: '1rem', paddingRight: '1rem' }}>
+                                <div />
+                                <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Unidad: {activePriceSeries.unit}</span>
+                            </div>
+                            <ResponsiveContainer width="100%" height="80%">
+                                <AreaChart data={activePriceSeries.data}>
+                                    <defs>
+                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                                    <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={50} />
+                                    <YAxis
+                                        tick={{ fontSize: 11 }}
+                                        label={{ value: activePriceSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }}
+                                    />
+                                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                                    <Area type="monotone" dataKey="value" stroke={COLORS.primary} fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
+                                    <Brush dataKey="date" height={30} stroke={COLORS.primary} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </section >
+
+                        <section id="chart-monthly" className="card" style={{ height: '350px' }}>
+                            <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Promedio Mensual</h3>
+                                        <LatestValueBadge data={monthlyData} unit={activePriceSeries.unit} mode="monthly" />
+                                    </div>
+                                    <StatsBadges min={monthlyStats.min} max={monthlyStats.max} unit={activePriceSeries.unit} />
+                                </div>
+                                {exportButtons('chart-monthly', `Promedio_Mensual_${activePriceSeries.name.replace(/\s+/g, '_')}`, monthlyData, activePriceSeries.unit)}
+                            </div>
+                            <ResponsiveContainer width="100%" height="80%">
+                                <LineChart data={monthlyData}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                                    <YAxis tick={{ fontSize: 11 }} label={{ value: activePriceSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }} />
+                                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                                    <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </section>
+
+                        <section id="chart-annual" className="card" style={{ height: '400px' }}>
+                            <div className="flex-between" style={{ marginBottom: '2.5rem', alignItems: 'flex-start' }}>
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Promedio Anual (Comparativo YoY)</h3>
+                                        <LatestValueBadge data={annualData} unit={activePriceSeries.unit} mode="annual" />
+                                    </div>
+                                    <StatsBadges min={annualStats.min} max={annualStats.max} unit={activePriceSeries.unit} />
+                                </div>
+                                {exportButtons('chart-annual', `Promedio_Anual_${activePriceSeries.name.replace(/\s+/g, '_')}`, annualData, activePriceSeries.unit)}
+                            </div>
+                            <ResponsiveContainer width="100%" height="75%">
+                                <BarChart data={annualData} margin={{ top: 60, right: 30, left: 20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                                    <XAxis dataKey="date" />
+                                    <YAxis label={{ value: activePriceSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }} />
+                                    <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                                    <Bar dataKey="value" fill={COLORS.primary} radius={[4, 4, 0, 0]} barSize={70} label={<CustomBarLabel />} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </section>
+                    </>
+                )
+            ) : (
+                <div className="card text-center p-8 text-slate-400">Próximamente: Datos de {selectedCategoryId} desde Supabase.</div>
+            )
+        }
+
+        {
+            selectedCategoryId === 'gas-natural' && subGasId === 'gas-natural-price' && reservesSeries && (
+                <section id="chart-reserves" className="card" style={{ height: '400px' }}>
+                    <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Reservas Probadas de Gas Natural (Seco)</h3>
+                                <LatestValueBadge data={reservesSeries.data} unit={reservesSeries.unit} mode="annual" />
+                            </div>
+                            <p style={{ fontSize: '0.75rem', color: COLORS.up, fontWeight: 600 }}>Fuente: EIA (Total USA)</p>
+                            <StatsBadges min={reservesStats.min} max={reservesStats.max} unit={reservesSeries.unit} />
+                            <span style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '4px', display: 'block' }}>Unidad: {reservesSeries.unit}</span>
+                        </div>
+                        {exportButtons('chart-reserves', 'Reservas_Gas_Natural', reservesSeries.data, reservesSeries.unit)}
+                    </div>
+                    <ResponsiveContainer width="100%" height="75%">
+                        <BarChart data={reservesSeries.data}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                            <XAxis dataKey="date" tickFormatter={(val) => val.substring(0, 4)} />
+                            <YAxis label={{ value: reservesSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }} />
+                            <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                            <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={60} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </section>
+            )
+        }
+
+        {
+            selectedCategoryId === 'gas-natural' && subGasId === 'gas-natural-price' && storageSeries && storageSeries.data.length > 0 && (
+                <section id="chart-storage" className="card" style={{ height: '450px', position: 'relative' }}>
+                    <div className="flex-between" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Weekly Natural Gas Storage Report</h3>
+                                <LatestValueBadge data={storageSeries.data} unit={storageSeries.unit} mode="daily" />
+                            </div>
+                            <p style={{ fontSize: '0.75rem', color: COLORS.up, fontWeight: 600, marginTop: '2px' }}>
+                                Fuente: EIA (Working Gas in Underground Storage - Lower 48)
+                            </p>
+                            <StatsBadges min={storageStats.min} max={storageStats.max} unit={storageSeries.unit} />
+                        </div>
+                        {exportButtons('chart-storage', 'Natural_Gas_Storage_Report', storageSeries.data, storageSeries.unit)}
+                    </div>
+                    <div className="flex-between" style={{ marginBottom: '1rem', paddingRight: '1rem' }}>
+                        <div />
+                        <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Unidad: {storageSeries.unit}</span>
+                    </div>
+                    <ResponsiveContainer width="100%" height="80%">
+                        <AreaChart data={storageSeries.data}>
+                            <defs>
+                                <linearGradient id="colorStorage" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.grid} />
+                            <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={50} />
+                            <YAxis
+                                tick={{ fontSize: 11 }}
+                                label={{ value: storageSeries.unit, angle: -90, position: 'insideLeft', style: { fontSize: '10px', fill: '#64748b' } }}
+                            />
+                            <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                            <Area type="monotone" dataKey="value" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorStorage)" strokeWidth={2} />
+                            <Brush dataKey="date" height={30} stroke="#8b5cf6" />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </section>
+            )
+        }
+    </div >
+);
 };
