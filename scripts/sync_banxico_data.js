@@ -1,6 +1,13 @@
 import https from 'https';
 import { createClient } from '@supabase/supabase-js';
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: resolve(__dirname, '../.env.local') });
 
 // Configuración Banxico
 const BANXICO_TOKEN = process.env.BANXICO_TOKEN;

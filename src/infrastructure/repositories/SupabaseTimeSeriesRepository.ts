@@ -5,29 +5,22 @@ import { supabase } from '../supabaseClient';
 export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
     async findAll(): Promise<TimeSeries[]> {
         try {
-            const idsToFetch = [
-                'gas-natural-price',
-                'gas-natural-reserves',
-                'gas-natural-storage',
-                'gas-natural-ipgn',
-                'gas-natural-ipgn-region-1',
-                'gas-natural-ipgn-region-2',
-                'gas-natural-ipgn-region-3',
-                'gas-natural-ipgn-region-4',
-                'gas-natural-ipgn-region-5',
-                'gas-natural-ipgn-region-6',
-                'paridad-mxn-usd',
-                'paridad-mxn-eur',
-                'paridad-usd-eur',
-                'inflation-rate-monthly',
-                'inflation-rate-annual'
-            ];
+            // 1. Obtener todos los IDs de series únicos presentes en la base de datos
+            const { data: idData, error: idError } = await supabase
+                .from('energy_data')
+                .select('series_id');
 
-            const seriesPromises = idsToFetch.map(async (id) => {
+            if (idError || !idData) throw idError || new Error('No data found');
+
+            const uniqueIds = Array.from(new Set(idData.map(d => d.series_id)));
+            console.log('Series detectadas en DB:', uniqueIds);
+
+            // 2. Fetch data for each unique series
+            const seriesPromises = uniqueIds.map(async (id) => {
                 let allData: any[] = [];
                 let page = 0;
                 const pageSize = 1000;
-                const maxPages = 20; // Hasta 20,000 registros
+                const maxPages = 20;
 
                 while (page < maxPages) {
                     const { data, error } = await supabase
@@ -44,7 +37,6 @@ export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
                 }
 
                 if (allData.length === 0) return null;
-                // Ordenar ascendentemente para el uso en la UI
                 return { id, data: allData.sort((a, b) => a.period.localeCompare(b.period)) };
             });
 
@@ -56,24 +48,44 @@ export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
                     const id = r!.id;
                     const points = r!.data;
 
-                    let name = 'Desconocido';
+                    let name = id; // Default to ID if not mapped
                     let type: TimeSeriesType = 'gas_natural';
 
+                    // Mapping logic
                     if (id === 'gas-natural-price') name = 'Gas Natural';
                     else if (id === 'gas-natural-reserves') name = 'Reservas Gas Natural';
                     else if (id === 'gas-natural-storage') name = 'Almacenamiento Gas Natural';
                     else if (id === 'gas-natural-ipgn') name = 'IPGN (Precios México)';
-                    else if (id === 'gas-natural-ipgn-region-1') name = 'IPGN Región I';
-                    else if (id === 'gas-natural-ipgn-region-2') name = 'IPGN Región II';
-                    else if (id === 'gas-natural-ipgn-region-3') name = 'IPGN Región III';
-                    else if (id === 'gas-natural-ipgn-region-4') name = 'IPGN Región IV';
-                    else if (id === 'gas-natural-ipgn-region-5') name = 'IPGN Región V';
-                    else if (id === 'gas-natural-ipgn-region-6') name = 'IPGN Región VI';
-                    else if (id === 'paridad-mxn-usd') { name = 'MXN/USD'; type = 'paridad'; }
-                    else if (id === 'paridad-mxn-eur') { name = 'MXN/EUR'; type = 'paridad'; }
-                    else if (id === 'paridad-usd-eur') { name = 'USD/EUR'; type = 'paridad'; }
-                    else if (id === 'inflacion-ipc') { name = 'Índice IPC'; type = 'inflacion'; }
-                    else if (id === 'inflacion-anual') { name = 'Tasa de Inflación Anual'; type = 'inflacion'; }
+                    else if (id.startsWith('gas-natural-ipgn-region-')) {
+                        const region = id.split('-').pop();
+                        name = `IPGN Región ${region}`;
+                    }
+                    else if (id.startsWith('paridad-')) {
+                        type = 'paridad';
+                        if (id === 'paridad-mxn-usd') name = 'MXN/USD';
+                        else if (id === 'paridad-mxn-eur') name = 'MXN/EUR';
+                        else if (id === 'paridad-usd-eur') name = 'USD/EUR';
+                    }
+                    else if (id.startsWith('inflacion-')) {
+                        type = 'inflacion';
+                        if (id === 'inflacion-ipc') name = 'Índice IPC';
+                        else if (id === 'inflacion-anual') name = 'Tasa de Inflación Anual';
+                    }
+                    else if (id.startsWith('temp-')) {
+                        type = 'temperatura';
+                        const parts = id.split('-');
+                        const metric = parts[1] === 'avg' ? 'Promedio' : parts[1] === 'min' ? 'Mínima' : 'Máxima';
+                        const city = parts.slice(2).join(' ').replace(/-/g, ' ');
+                        name = `Temperatura ${metric} (${city})`;
+                    }
+                    else if (id.startsWith('pib-')) {
+                        type = 'pib';
+                        if (id === 'pib-nacional') name = 'PIB Nacional';
+                        else {
+                            const stateId = id.split('-').pop();
+                            name = `PIB Estado ${stateId}`;
+                        }
+                    }
 
                     return {
                         id,
@@ -89,10 +101,10 @@ export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
                     };
                 });
 
-            // Optimización de Cache: Guardar solo los últimos 1000 puntos para no saturar localStorage
-            const cachedData = mappedData.map(s => ({
+            // Optimización de Cache
+            const cachedData = mappedData.slice(0, 50).map(s => ({
                 ...s,
-                data: s.data.slice(-1000)
+                data: s.data.slice(-500) // Reduzco un poco el cache para evitar problemas de cuota
             }));
 
             try {
