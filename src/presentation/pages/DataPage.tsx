@@ -1002,6 +1002,30 @@ export const DataPage = () => {
                             </button>
                         ))}
                     </div>
+                    {/* Date Range Selector for Parity */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: '#f8fafc', padding: '0.5rem 1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Desde</span>
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    style={{ border: 'none', background: 'transparent', fontSize: '0.875rem', fontWeight: 600, color: COLORS.text, outline: 'none' }}
+                                />
+                            </div>
+                            <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0' }} />
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Hasta</span>
+                                <input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    style={{ border: 'none', background: 'transparent', fontSize: '0.875rem', fontWeight: 600, color: COLORS.text, outline: 'none' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '1.5rem' }}>
