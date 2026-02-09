@@ -6,6 +6,7 @@ import { Input } from '../components/ui/Input';
 
 export const LoginPage = () => {
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -14,10 +15,10 @@ export const LoginPage = () => {
         e.preventDefault();
         setError('');
         try {
-            await login(username);
+            await login(username, password);
             navigate('/dashboard');
-        } catch (err) {
-            setError('Credenciales inválidas. Intente con "admin" o "cliente1".');
+        } catch (err: any) {
+            setError(err.message || 'Credenciales inválidas');
         }
     };
 
@@ -46,9 +47,17 @@ export const LoginPage = () => {
                 <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
                     <Input
                         label="Usuario"
-                        placeholder="ej. admin, cliente1"
+                        placeholder="Roberto Rojo, Comercial o Flex"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                    />
+
+                    <Input
+                        label="Contraseña"
+                        type="password"
+                        placeholder="Ingrese su contraseña"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
 
                     {error && (
@@ -62,8 +71,12 @@ export const LoginPage = () => {
                     </Button>
 
                     <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem' }}>
-                        <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Usuarios de demostración:</p>
-                        <p>Admin: <code>admin</code> | Clientes: <code>cliente1</code></p>
+                        <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Cuentas de acceso:</p>
+                        <div style={{ display: 'grid', gap: '4px' }}>
+                            <p>Admin: <code>Roberto Rojo</code></p>
+                            <p>Interno: <code>Comercial</code></p>
+                            <p>Cliente: <code>Flex</code></p>
+                        </div>
                     </div>
                 </form>
             </div>

@@ -4,7 +4,7 @@ import { useUseCases } from '../hooks/useUseCases';
 
 interface AuthContextType {
     user: User | null;
-    login: (username: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -15,9 +15,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const { loginUseCase } = useUseCases();
 
-    const login = async (username: string) => {
+    const login = async (username: string, password: string) => {
         try {
-            const loggedUser = await loginUseCase.execute(username);
+            const loggedUser = await loginUseCase.execute(username, password);
             setUser(loggedUser);
         } catch (error) {
             console.error(error);

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, LogOut, Map } from 'lucide-react';
+import { TrendingUp, LogOut, Map, Upload } from 'lucide-react';
 
 interface LayoutProps {
     children: ReactNode;
@@ -70,14 +70,27 @@ export const Layout = ({ children }: LayoutProps) => {
                         className={`nav-item ${isActive('/data') ? 'active' : ''}`}
                     >
                         <TrendingUp size={20} />
-                        <span>Data</span>
+                        <span>Data Histórica</span>
                     </Link>
+
+                    {user?.role === 'admin' && (
+                        <Link
+                            to="/upload"
+                            className={`nav-item ${isActive('/upload') ? 'active' : ''}`}
+                            style={{ marginTop: 'auto', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}
+                        >
+                            <Upload size={20} />
+                            <span>Administrar</span>
+                        </Link>
+                    )}
                 </nav>
 
                 <div className="sidebar-footer">
                     <div className="user-info">
                         <p className="username">{user?.username}</p>
-                        <p className="role">{user?.role}</p>
+                        <p className="role" style={{ textTransform: 'capitalize' }}>
+                            {user?.role === 'admin' ? 'Administrador' : user?.role === 'interno' ? 'Personal Interno' : 'Cliente'}
+                        </p>
                     </div>
                     <button onClick={logout} className="logout-btn">
                         <LogOut size={16} />

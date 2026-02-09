@@ -7,7 +7,7 @@ export class GetPowerPlantsUseCase {
     constructor(private plantRepository: IPowerPlantRepository) { }
 
     async execute(user: User): Promise<PowerPlant[]> {
-        if (user.role === Roles.ADMIN) {
+        if (user.role === Roles.ADMIN || user.role === Roles.INTERNO) {
             return await this.plantRepository.findAll();
         } else {
             if (!user.assignedPlantId) {
