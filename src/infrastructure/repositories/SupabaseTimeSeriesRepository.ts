@@ -5,14 +5,35 @@ import { supabase } from '../supabaseClient';
 export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
     async findAll(): Promise<TimeSeries[]> {
         try {
-            // 1. Obtener todos los IDs de series únicos presentes en la base de datos
-            const { data: idData, error: idError } = await supabase
-                .from('energy_data')
-                .select('series_id');
+            // 1. Obtener todos los IDs de series únicos presentes en la base de datos de forma más robusta
+            let allIds: string[] = [];
+            let offset = 0;
+            const limit = 1000;
 
-            if (idError || !idData) throw idError || new Error('No data found');
+            // Siempre incluimos los IDs conocidos por seguridad
+            const knownIds = [
+                'gas-natural-price', 'gas-natural-reserves', 'gas-natural-storage', 'gas-natural-ipgn',
+                'gas-natural-ipgn-region-1', 'gas-natural-ipgn-region-2', 'gas-natural-ipgn-region-3',
+                'gas-natural-ipgn-region-4', 'gas-natural-ipgn-region-5', 'gas-natural-ipgn-region-6',
+                'paridad-mxn-usd', 'paridad-mxn-eur', 'paridad-usd-eur',
+                'inflacion-ipc', 'inflacion-anual', 'pib-nacional'
+            ];
 
-            const uniqueIds = Array.from(new Set(idData.map(d => d.series_id)));
+            while (offset < 25000) { // Límite razonable para escanear IDs
+                const { data: idBatch, error: idError } = await supabase
+                    .from('energy_data')
+                    .select('series_id')
+                    .range(offset, offset + limit - 1);
+
+                if (idError) break;
+                if (!idBatch || idBatch.length === 0) break;
+
+                allIds = [...allIds, ...idBatch.map(d => d.series_id)];
+                if (idBatch.length < limit) break;
+                offset += limit;
+            }
+
+            const uniqueIds = Array.from(new Set([...knownIds, ...allIds]));
             console.log('Series detectadas en DB:', uniqueIds);
 
             // 2. Fetch data for each unique series
@@ -66,10 +87,10 @@ export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
                         else if (id === 'paridad-mxn-eur') name = 'MXN/EUR';
                         else if (id === 'paridad-usd-eur') name = 'USD/EUR';
                     }
-                    else if (id.startsWith('inflacion-')) {
+                    else if (id.startsWith('inflacion-') || id.startsWith('inflation-')) {
                         type = 'inflacion';
-                        if (id === 'inflacion-ipc') name = 'Índice IPC';
-                        else if (id === 'inflacion-anual') name = 'Tasa de Inflación Anual';
+                        if (id === 'inflacion-ipc' || id === 'inflation-rate-monthly') name = 'Índice IPC';
+                        else if (id === 'inflacion-anual' || id === 'inflation-rate-annual') name = 'Tasa de Inflación Anual';
                     }
                     else if (id.startsWith('temp-')) {
                         type = 'temperatura';
@@ -104,7 +125,7 @@ export class SupabaseTimeSeriesRepository implements ITimeSeriesRepository {
             // Optimización de Cache
             const cachedData = mappedData.slice(0, 50).map(s => ({
                 ...s,
-                data: s.data.slice(-500) // Reduzco un poco el cache para evitar problemas de cuota
+                data: s.data.slice(-500)
             }));
 
             try {
