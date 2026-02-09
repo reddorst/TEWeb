@@ -622,7 +622,7 @@ export const DataPage = () => {
         );
     };
 
-    if (seriesList.length === 0 || isLoading) return <div className="p-8 text-center text-slate-500">Sincronizando con Supabase...</div>;
+    if (seriesList.length === 0 || isLoading) return <div className="p-8 text-center text-slate-500">Cargando base de datos...</div>;
 
     // Layout for PIB (direct integration)
     if (selectedCategoryId === 'pib') {
