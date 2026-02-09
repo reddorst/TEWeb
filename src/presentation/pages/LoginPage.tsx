@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Bolt } from 'lucide-react';
 
 export const LoginPage = () => {
     const [username, setUsername] = useState('');
@@ -18,43 +17,53 @@ export const LoginPage = () => {
             await login(username);
             navigate('/dashboard');
         } catch (err) {
-            setError('Invalid credentials. Try "admin" or "cliente1".');
+            setError('Credenciales inválidas. Intente con "admin" o "cliente1".');
         }
     };
 
     return (
-        <div className="login-container">
-            <div className="login-box">
-                <div className="login-header">
-                    <div style={{ display: 'inline-flex', padding: '10px', backgroundColor: '#2563eb', borderRadius: '50%', marginBottom: '1rem' }}>
-                        <Bolt color="white" size={32} />
+        <div className="login-container" style={{ backgroundColor: '#f8fafc' }}>
+            <div className="login-box" style={{ padding: '2.5rem', maxWidth: '450px' }}>
+                <div className="login-header" style={{ textAlign: 'center' }}>
+                    <div style={{ marginBottom: '2rem' }}>
+                        <img
+                            src="/Logo-tracsa-energia-header.svg"
+                            alt="Tracsa Energía"
+                            style={{ maxWidth: '200px', height: 'auto' }}
+                        />
                     </div>
-                    <h1>SCADA Login</h1>
-                    <p style={{ color: '#64748b' }}>Enter your credentials to access</p>
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>
+                        Energy Intelligence Hub
+                    </h1>
+                    <p style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Login
+                    </p>
+                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginTop: '1rem' }}>
+                        Ingrese sus credenciales para acceder
+                    </p>
                 </div>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
                     <Input
-                        label="Username"
-                        placeholder="e.g., admin, cliente1"
+                        label="Usuario"
+                        placeholder="ej. admin, cliente1"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                     />
 
                     {error && (
-                        <div style={{ padding: '0.75rem', backgroundColor: '#fef2f2', color: '#dc2626', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid #fecaca' }}>
+                        <div style={{ padding: '0.75rem', backgroundColor: '#fef2f2', color: '#dc2626', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid #fecaca', fontSize: '0.875rem' }}>
                             {error}
                         </div>
                     )}
 
-                    <Button type="submit" className="btn-full">
-                        Sign In
+                    <Button type="submit" className="btn-full" style={{ padding: '0.75rem', fontSize: '1rem', fontWeight: 700 }}>
+                        Iniciar Sesión
                     </Button>
 
-                    <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8' }}>
-                        <p>Demo Users:</p>
-                        <p>Admin: <code>admin</code></p>
-                        <p>Clients: <code>cliente1</code>, <code>cliente2</code></p>
+                    <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem' }}>
+                        <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Usuarios de demostración:</p>
+                        <p>Admin: <code>admin</code> | Clientes: <code>cliente1</code></p>
                     </div>
                 </form>
             </div>

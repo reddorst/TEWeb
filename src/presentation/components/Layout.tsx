@@ -81,7 +81,7 @@ export const Layout = ({ children }: LayoutProps) => {
                     </div>
                     <button onClick={logout} className="logout-btn">
                         <LogOut size={16} />
-                        Sign Out
+                        Cerrar Sesión
                     </button>
                 </div>
             </aside>
